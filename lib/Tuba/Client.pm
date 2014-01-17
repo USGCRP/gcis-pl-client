@@ -6,13 +6,14 @@ use JSON::XS;
 use Path::Class qw/file/;
 use v5.14;
 
-has url    => 'http://localhost:3000';
-has key    => sub { die "no key" };
-has ua     => sub { state $ua ||= Mojo::UserAgent->new(); $ua; };
-has hdrs   => sub { {"Accept" => "application/json", "Authorization" => "Basic ".shift->key} };
-has logger => sub { state $log ||= Mojo::Log->new(); };
-has json   => sub { state $json ||= JSON::XS->new(); };
+has url      => 'http://localhost:3000';
+has 'key';
 has 'error';
+has ua       => sub { state $ua   ||= Mojo::UserAgent->new(); };
+has logger   => sub { state $log  ||= Mojo::Log->new(); };
+has json     => sub { state $json ||= JSON::XS->new(); };
+sub auth_hdr { ($a = shift->key )  ? ("Authorization" => "Basic $a") : () };
+sub hdrs     { +{shift->auth_hdr,      "Accept"        => "application/json" } };
 
 sub _follow_redirects {
     my $s = shift;
@@ -63,6 +64,21 @@ sub post {
     return $res->json;
 }
 
+sub post_quiet {
+    my $s = shift;
+    my $path = shift;
+    my $data = shift;
+    my $tx = $s->ua->post($s->url."$path" => $s->hdrs => json => $data );
+    $tx = $s->_follow_redirects($tx);
+    my $res = $tx->success or do {
+        $s->logger->error("$path : ".$tx->error.$tx->res->body) unless $tx->res->code == 404;
+        return;
+    };
+    return unless $res;
+    my $json = $res->json or return $res->body;
+    return $res->json;
+}
+
 sub find_credentials {
     my $s = shift;
     my $home = $ENV{HOME};
@@ -86,6 +102,14 @@ sub login {
     my $got = $c->get('/login') or return;
     $c->get('/login')->{login} eq 'ok' or return;
     return $c;
+}
+
+sub get_chapter_map {
+    my $c = shift;
+    my $report = shift or die "no report";
+    my $all = $c->get("/report/$report/chapter?all=1") or die $c->url.' : '.$c->error;
+    my %map = map { $_->{number} // $_->{identifier} => $_->{identifier} } @$all;
+    return %map;
 }
 
 1;
@@ -137,11 +161,21 @@ Looks for a file like the one that can be downloaded from L<http://data.globalch
 This file should be saved in a file named $HOME/.gcis.json, or $HOME/.gcis.<foo>.json, where
 <foo> is a substring of the URL.  (e.g. .gcis.local.json for http://localhost:3000)
 
+    $c->find_credentials;
+
 =head2 login
 
 Verify that a get request to /login succeeds.
 
 Returns the client object if and only if it succeeds.
+
+    $c->login;
+
+=head2 get_chapter_map
+
+Get a map from chapter number to identifer.
+
+    my $identifier = $c->chapter->map->{1}
 
 =head1 SEE ALSO
 
