@@ -178,7 +178,9 @@ sub connect {
     my %args = @_;
 
     my $url = $args{url} or die "missing url";
-    my $c = $class->new->find_credentials->login or die "Failed to log in to $url";
+    my $c = $class->new;
+    $c->url($url);
+    $c->find_credentials->login or die "Failed to log in to $url";
     return $c;
 }
 

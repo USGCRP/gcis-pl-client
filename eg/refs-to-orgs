@@ -9,6 +9,7 @@ use v5.14;
 
 use Tuba::Client;
 use Data::Dumper;
+use Smart::Comments;
 use Encode;
 
 sub usage {
@@ -46,22 +47,28 @@ sub split_orgs {
 
       }
       for @orgs;
-    return [ grep defined && length, @orgs ];
+    return [ grep defined && length && $_ !~ /^(inc|llc)$/i, @orgs ];
 }
 
+my %stats = ( existing => 0, new => 0 );
 
-for my $ref ($c->get("/report/$report/reference?all=1")) {
+for my $ref ($c->get("/report/$report/reference?all=1")) {  ### Processing--->[%]          done
   next unless $ref->{attrs}{reftype} eq 'Report';
   my $reference_identifier = $ref->{identifier};
-  my $organizations = split_orgs($ref->{attrs}{Institution} || $ref->{Author});
+  # say "examining $reference_identifier";
+  my $organizations = split_orgs($ref->{attrs}{Institution} || $ref->{attrs}{institution} || $ref->{attrs}{publisher});
+  unless (@$organizations) {
+      #say "no orgs for /reference/$reference_identifier";
+  }
   for my $organization_name (@$organizations) {
     my $org = $c->post_quiet("/organization/lookup/name",
       {name => $organization_name});
     if ($org) {
-      say "Found " . encode('UTF-8', $organization_name);
-    }
-    else {
-      say "Creating " . encode('UTF-8', $organization_name);
+      $stats{existing}++;
+      # say "Found " . encode('UTF-8', $organization_name);
+    } else {
+      $stats{new}++;
+      # say "Creating " . encode('UTF-8', $organization_name);
       unless ($dry_run) {
         $org = $c->post("/organization", {name => $organization_name}) or do {
           warn $c->error;
@@ -75,9 +82,10 @@ for my $ref ($c->get("/report/$report/reference?all=1")) {
 
     my $add_contributor_uri = $pub->{uri};
     $add_contributor_uri =~ s[/report][/report/contributors] or do {
-      die "could not match update_contributors in $add_contributor_uri";
+      warn "could not match update_contributors in uri : $add_contributor_uri";
+      next;
     };
-    say "posting to $add_contributor_uri";
+    # say "posting to $add_contributor_uri";
     !$dry_run and do {
       $c->post(
         $add_contributor_uri => {
@@ -87,8 +95,9 @@ for my $ref ($c->get("/report/$report/reference?all=1")) {
         }
       ) or warn $c->error;
     };
-    say "posted to $add_contributor_uri";
+    # say "posted to $add_contributor_uri";
   }
 }
 
+say "stats : ".Dumper(\%stats);
 
