@@ -7,7 +7,7 @@
 
 use v5.14;
 
-use Tuba::Client;
+use Gcis::Client;
 use Data::Dumper;
 use Smart::Comments;
 use Encode;
@@ -27,7 +27,7 @@ $dry_run   = shift @ARGV if $ARGV[0] eq '-n';
 my $url    = $ARGV[0] or usage();
 my $report = $ARGV[1] || 'nca3';
 
-my $c = Tuba::Client->connect(url => $url);
+my $c = Gcis::Client->connect(url => $url);
 
 say "Dry run" if $dry_run;
 

@@ -1,8 +1,9 @@
-package Tuba::Client;
+package Gcis::Client;
 use Mojo::UserAgent;
 use Mojo::Base -base;
 use Mojo::Log;
 use JSON::XS;
+use YAML::XS qw/LoadFile/;
 use Path::Class qw/file/;
 use Data::Dumper;
 use v5.14;
@@ -117,17 +118,14 @@ sub post_quiet {
 sub find_credentials {
     my $s = shift;
     my $home = $ENV{HOME};
-    my ($json_file) = grep {
-      my ($which) = ( $_ =~ /(?:^|\/)\.gcis\.?(.*)\.json$/ );
-      die "bad name : $_" unless $which;
-      $s->url =~ /$which/;
-    } glob "$home/.gcis.*.json";
-    unless ($json_file) {
-        $s->logger->warn("no credentials found for ".$s->url);
-        return;
-    }
-    $s->logger->debug("Credentials from $json_file will be used for ".$s->url);
-    my $key = $s->json->decode(scalar file($json_file)->slurp)->{key};
+    die "need url to find credentials" unless $s->url;
+    my $conf_file = "$home/etc/Gcis.conf";
+    -e $conf_file or die "Missing $conf_file";
+    my $conf = LoadFile($conf_file);
+    my @found = grep { $_->{url} eq $s->url } @$conf;
+    die "Multiple matches for ".$s->url." in $conf_file." if @found > 1;
+    die "No matches for ".$s->url." in $conf_file." if @found < 1;
+    my $key = $found[0]->{key} or die "no key for ".$s->url." in $conf_file";
     $s->key($key);
     return $s;
 }
@@ -190,19 +188,19 @@ __END__
 
 =head1 NAME
 
-Tuba::Client -- Perl client for interacting with the GCIS API
+Gcis::Client -- Perl client for interacting with the GCIS API
 
 =head1 SYNOPSIS
 
-    my $c = Tuba::Client->new->find_credentials->login;
+    my $c = Gcis::Client->new->find_credentials->login;
 
-    my $c = Tuba::Client->new;
+    my $c = Gcis::Client->new;
     $c->url("http://data.globalchange.gov");
-    $c->logger(Mojo::Log->new(path => 'tuba.log');
+    $c->logger(Mojo::Log->new(path => '/tmp/gcis-client.log');
 
-    my $c = Tuba::Client->new(url => 'http://data.globalchange.gov');
+    my $c = Gcis::Client->new(url => 'http://data.globalchange.gov');
 
-    my $c = Tuba::Client->new
+    my $c = Gcis::Client->new
         ->url('http://data.globalchange.gov')
         ->logger($logger)
         ->find_credentials
@@ -222,24 +220,19 @@ Tuba::Client -- Perl client for interacting with the GCIS API
 
 =head1 DESCRIPTION
 
-This is a simple client for Tuba, based on L<Mojo::UserAgent>.
+This is a simple client for Gcis, based on L<Mojo::UserAgent>.
 
 =head1 METHODS
 
 =head2 connect
 
-    my $c = Tuba::Client->connect(url => $url);
+    my $c = Gcis::Client->connect(url => $url);
 
-Shorthand for Tuba::Client->new->url($url)->find_credentials->login or die "Failed to log in to $url";
+Shorthand for Gcis::Client->new->url($url)->find_credentials->login or die "Failed to log in to $url";
 
 =head2 find_credentials
 
-Looks for a file like the one that can be downloaded from L<http://data.globalchange.gov/login_key.json>.
-
-This file should be saved in a file named $HOME/.gcis.json, or $HOME/.gcis.<foo>.json, where
-<foo> is a substring of the URL.  (e.g. .gcis.local.json for http://localhost:3000)
-
-    $c->find_credentials;
+Matches a URL with one in the configuration file.  See CONFIGURATION below.
 
 =head2 login
 
@@ -259,6 +252,19 @@ Get a map from chapter number to identifer.
 
     Get a URL, requesting JSON, converting an arrayref to an array
 if called in an array context.
+
+=head1 CONFIGRATION
+
+Credentials can be stored in a YAML file called ~/etc/Gcis.conf.
+This contains URLs and keys, in this format :
+
+    - url      : http://data.gcis-dev-back.joss.ucar.edu
+      userinfo : bduggan@usgcrp.gov:298015f752d99e789056ef826a7db7afc38a8bbd6e3e23b3
+      key      : M2FiLTg2N2QtYjhiZTVhM5ZWEtYjNkM5ZWEtYjNkMS00LTgS00LTg2N2QtYZDFhzQyNGUxCg==
+
+    - url      : http://data-stage.globalchange.gov
+      userinfo : bduggan@usgcrp.gov:298015f752d99e789056ef826a7db7afc38a8bbd6e3e23b3
+      key      : M2FiLTg2N2QtYjhiZTVhM5ZWEtYjNkM5ZWEtYjNkMS00LTgS00LTg2N2QtYZDFhzQyNGUxCg==
 
 =head1 SEE ALSO
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
 
 use lib '../lib';
-use Tuba::Client;
+use Gcis::Client;
 use Data::Dumper;
 use v5.14;
 
-my $c = Tuba::Client->new;
+my $c = Gcis::Client->new;
 $c->url($ARGV[0]) if $ARGV[0];
 $c->find_credentials->login;
 my $findings = $c->get('/report/nca3draft/finding');
