@@ -1,0 +1,6 @@
+Build.PL
+eg/assign-keywords.pl
+eg/login.pl
+eg/refs-to-orgs
+lib/Gcis/Client.pm
+MANIFEST			This list of files

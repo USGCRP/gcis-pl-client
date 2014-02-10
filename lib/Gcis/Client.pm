@@ -8,6 +8,8 @@ use Path::Class qw/file/;
 use Data::Dumper;
 use v5.14;
 
+our $VERSION = 0.01;
+
 has url      => 'http://localhost:3000';
 has 'key';
 has 'error';
