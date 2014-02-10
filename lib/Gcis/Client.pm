@@ -194,11 +194,13 @@ Gcis::Client -- Perl client for interacting with the GCIS API
 
 =head1 SYNOPSIS
 
-    my $c = Gcis::Client->new->find_credentials->login;
-
     my $c = Gcis::Client->new;
+
     $c->url("http://data.globalchange.gov");
+
     $c->logger(Mojo::Log->new(path => '/tmp/gcis-client.log');
+
+    my $chapters = $c->get("/report/nca3draft/chapter?all=1") or die $c->error;
 
     my $c = Gcis::Client->new(url => 'http://data.globalchange.gov');
 
@@ -207,8 +209,6 @@ Gcis::Client -- Perl client for interacting with the GCIS API
         ->logger($logger)
         ->find_credentials
         ->login;
-
-    my $chapters = $c->get("/report/nca3draft/chapter?all=1") or die $c->error;
 
     my $ref = $c->post(
       "/reference",
