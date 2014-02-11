@@ -16,13 +16,19 @@ has 'error';
 has ua       => sub { state $ua   ||= Mojo::UserAgent->new(); };
 has logger   => sub { state $log  ||= Mojo::Log->new(); };
 has json     => sub { state $json ||= JSON::XS->new(); };
-sub auth_hdr { ($a = shift->key )  ? ("Authorization" => "Basic $a") : () };
-sub hdrs     { +{shift->auth_hdr,      "Accept"        => "application/json" } };
+has accept   => "application/json";
+
+sub auth_hdr { ($a = shift->key) ? ("Authorization" => "Basic $a") : () }
+
+sub hdrs {
+  my $c = shift;
+  +{$c->auth_hdr, "Accept" => $c->accept};
+}
 
 sub _follow_redirects {
     my $s = shift;
     my $tx = shift;
-    while ($tx && $tx->res && $tx->res->code && $tx->res->code == 302) {
+    while ($tx && $tx->res && $tx->res->code && ($tx->res->code == 302 || $tx->res->code==303 )) {
         my $next = $tx->res->headers->location;
         $tx = $s->ua->get($next => $s->hdrs);
     }
