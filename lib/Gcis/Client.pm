@@ -228,7 +228,7 @@ Gcis::Client -- Perl client for interacting with the GCIS API
 
 =head1 DESCRIPTION
 
-This is a simple client for Gcis, based on L<Mojo::UserAgent>.
+This is a simple client for the GCIS API, based on L<Mojo::UserAgent>.
 
 =head1 METHODS
 
@@ -254,7 +254,7 @@ Returns the client object if and only if it succeeds.
 
 Get a map from chapter number to identifer.
 
-    my $identifier = $c->-get_chapter_map->{1}
+    my $identifier = $c->-get_chapter_map('nca3')->{1}
 
 =head2 get
 
@@ -266,13 +266,13 @@ if called in an array context.
 Credentials can be stored in a YAML file called ~/etc/Gcis.conf.
 This contains URLs and keys, in this format :
 
-    - url      : http://data.gcis-dev-back.joss.ucar.edu
-      userinfo : bduggan@usgcrp.gov:298015f752d99e789056ef826a7db7afc38a8bbd6e3e23b3
+    - url      : http://data-stage.globalchange.gov
+      userinfo : me@example.com:298015f752d99e789056ef826a7db7afc38a8bbd6e3e23b3
       key      : M2FiLTg2N2QtYjhiZTVhM5ZWEtYjNkM5ZWEtYjNkMS00LTgS00LTg2N2QtYZDFhzQyNGUxCg==
 
-    - url      : http://data-stage.globalchange.gov
-      userinfo : bduggan@usgcrp.gov:298015f752d99e789056ef826a7db7afc38a8bbd6e3e23b3
-      key      : M2FiLTg2N2QtYjhiZTVhM5ZWEtYjNkM5ZWEtYjNkMS00LTgS00LTg2N2QtYZDFhzQyNGUxCg==
+    - url      : http://data.globalchange.gov
+      userinfo : username:pass
+      key      : key
 
 =head1 SEE ALSO
 

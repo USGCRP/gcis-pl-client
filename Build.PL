@@ -3,7 +3,7 @@ use Module::Build;
 
 my $builder = Module::Build->new(
     module_name         => 'Gcis::Client',
-    license             => 'perl',
+    license             => 'gpl_3',
     dist_version_from   => 'lib/Gcis/Client.pm',
     dist_abstract       => "Client for GCIS Structured Data Server",
     release_status      => 'stable',
