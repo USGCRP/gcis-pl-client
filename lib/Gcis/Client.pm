@@ -254,7 +254,7 @@ Returns the client object if and only if it succeeds.
 
 Get a map from chapter number to identifer.
 
-    my $identifier = $c->-get_chapter_map('nca3')->{1}
+    my $identifier = $c->get_chapter_map('nca3')->{1}
 
 =head2 get
 
