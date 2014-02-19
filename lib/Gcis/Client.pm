@@ -134,6 +134,7 @@ sub find_credentials {
     die "Multiple matches for ".$s->url." in $conf_file." if @found > 1;
     die "No matches for ".$s->url." in $conf_file." if @found < 1;
     my $key = $found[0]->{key} or die "no key for ".$s->url." in $conf_file";
+    $s->logger->info("Loaded configuration from $conf_file");
     $s->key($key);
     return $s;
 }
