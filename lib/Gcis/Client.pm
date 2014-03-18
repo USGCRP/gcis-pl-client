@@ -13,33 +13,31 @@ our $VERSION = 0.01;
 has url      => 'http://localhost:3000';
 has 'key';
 has 'error';
-has ua       => sub { state $ua   ||= Mojo::UserAgent->new(); };
+has ua => sub {
+  my $c = shift;
+  state $ua;
+  return $ua if $ua;
+  $ua = Mojo::UserAgent->new();
+  $ua->on(
+    start => sub {
+      my ($ua, $tx) = @_;
+      $tx->req->headers->header($c->auth_hdr);
+      $tx->req->headers->header(Accept => $c->accept);
+    }
+  );
+  $ua->max_redirects(5);
+  $ua;
+};
 has logger   => sub { state $log  ||= Mojo::Log->new(); };
 has json     => sub { state $json ||= JSON::XS->new(); };
 has accept   => "application/json";
 
 sub auth_hdr { ($a = shift->key) ? ("Authorization" => "Basic $a") : () }
 
-sub hdrs {
-  my $c = shift;
-  +{$c->auth_hdr, "Accept" => $c->accept};
-}
-
-sub _follow_redirects {
-    my $s = shift;
-    my $tx = shift;
-    while ($tx && $tx->res && $tx->res->code && ($tx->res->code == 302 || $tx->res->code==303 )) {
-        my $next = $tx->res->headers->location;
-        $tx = $s->ua->get($next => $s->hdrs);
-    }
-    return $tx;
-}
-
 sub get {
     my $s = shift;
     my $path = shift;
-    my $tx = $s->ua->get($s->url."$path" => $s->hdrs);
-    $tx = $s->_follow_redirects($tx);
+    my $tx = $s->ua->get($s->url."$path");
     my $res = $tx->success;
     unless ($res) {
         if ($tx->res->code && $tx->res->code == 404) {
@@ -63,8 +61,7 @@ sub post {
     my $s = shift;
     my $path = shift;
     my $data = shift;
-    my $tx = $s->ua->post($s->url."$path" => $s->hdrs => json => $data );
-    $tx = $s->_follow_redirects($tx);
+    my $tx = $s->ua->post($s->url."$path" => json => $data );
     my $res = $tx->success or do {
         $s->logger->error("$path : ".$tx->error.$tx->res->body);
         return;
@@ -77,7 +74,7 @@ sub post {
 sub delete {
     my $s = shift;
     my $path = shift;
-    my $tx = $s->ua->delete($s->url."$path" => $s->hdrs);
+    my $tx = $s->ua->delete($s->url."$path");
     my $res = $tx->success;
     unless ($res) {
         if ($tx->res->code && $tx->res->code == 404) {
@@ -96,8 +93,7 @@ sub put_file {
     my $path = shift;
     my $file = shift;
     my $data = file($file)->slurp;
-    my $tx = $s->ua->put($s->url."$path" => $s->hdrs => $data );
-    $tx = $s->_follow_redirects($tx);
+    my $tx = $s->ua->put($s->url."$path" => $data );
     my $res = $tx->success or do {
         $s->logger->error("$path : ".$tx->error.$tx->res->body);
         return;
@@ -112,8 +108,7 @@ sub post_quiet {
     my $s = shift;
     my $path = shift;
     my $data = shift;
-    my $tx = $s->ua->post($s->url."$path" => $s->hdrs => json => $data );
-    $tx = $s->_follow_redirects($tx);
+    my $tx = $s->ua->post($s->url."$path" => json => $data );
     my $res = $tx->success or do {
         $s->logger->error("$path : ".$tx->error.$tx->res->body) unless $tx->res->code == 404;
         return;
@@ -169,6 +164,23 @@ sub figures {
         $figures = $c->get("/report/$report/figure?all=1") or die $c->error;
     }
     return wantarray ? @$figures : $figures;
+}
+
+sub findings {
+    my $c = shift;
+    my %a = @_;
+    my $report = $a{report} or die "no report";
+    if (my $chapter_number = $a{chapter_number}) {
+        $c->{_chapter_map}->{$report} //= $c->get_chapter_map($report);
+        $a{chapter} = $c->{_chapter_map}->{$report}->{$chapter_number};
+    }
+    my $findings;
+    if (my $chapter = $a{chapter}) {
+        $findings = $c->get("/report/$report/chapter/$chapter/finding?all=1") or die $c->error;
+    } else {
+        $findings = $c->get("/report/$report/finding?all=1") or die $c->error;
+    }
+    return wantarray ? @$findings : $findings;
 }
 
 sub get_form {
