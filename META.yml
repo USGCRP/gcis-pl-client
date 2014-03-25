@@ -18,5 +18,7 @@ provides:
     file: lib/Gcis/Client.pm
     version: 0.02
 requires:
+  JSON::XS: 0
+  Path::Class: 0
   YAML::XS: 0
 version: 0.02

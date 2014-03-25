@@ -24,6 +24,8 @@
       },
       "runtime" : {
          "requires" : {
+            "JSON::XS" : "0",
+            "Path::Class" : "0",
             "YAML::XS" : "0"
          }
       }
