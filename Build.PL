@@ -12,6 +12,8 @@ my $builder = Module::Build->new(
     },
     requires => {
         'YAML::XS' => 0,
+        'JSON:XS' => 0,
+        'Path::Class' => 0,
     },
     add_to_cleanup     => [ 'Gcis-Client-*' ],
     create_makefile_pl => 'traditional',

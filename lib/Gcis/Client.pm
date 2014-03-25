@@ -8,7 +8,7 @@ use Path::Class qw/file/;
 use Data::Dumper;
 use v5.14;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 has url      => 'http://localhost:3000';
 has 'key';
@@ -21,7 +21,7 @@ has ua => sub {
   $ua->on(
     start => sub {
       my ($ua, $tx) = @_;
-      $tx->req->headers->header($c->auth_hdr);
+      $tx->req->headers->header($c->auth_hdr) if $c->auth_hdr;
       $tx->req->headers->header(Accept => $c->accept);
     }
   );
@@ -141,12 +141,36 @@ sub login {
     return $c;
 }
 
+sub use_env {
+    my $c = shift;
+    my $url = $ENV{GCIS_API_URL} or die "please set GCIS_API_URL";
+    $c->url($url);
+    return $c;
+}
+
 sub get_chapter_map {
     my $c = shift;
     my $report = shift or die "no report";
     my $all = $c->get("/report/$report/chapter?all=1") or die $c->url.' : '.$c->error;
     my %map = map { $_->{number} // $_->{identifier} => $_->{identifier} } @$all;
     return wantarray ? %map : \%map;
+}
+
+sub tables {
+    my $c = shift;
+    my %a = @_;
+    my $report = $a{report} or die "no report";
+    if (my $chapter_number = $a{chapter_number}) {
+        $c->{_chapter_map}->{$report} //= $c->get_chapter_map($report);
+        $a{chapter} = $c->{_chapter_map}->{$report}->{$chapter_number};
+    }
+    my $tables;
+    if (my $chapter = $a{chapter}) {
+        $tables = $c->get("/report/$report/chapter/$chapter/table?all=1") or die $c->error;
+    } else {
+        $tables = $c->get("/report/$report/table?all=1") or die $c->error;
+    }
+    return wantarray ? @$tables : $tables;
 }
 
 sub figures {
@@ -215,7 +239,11 @@ Gcis::Client -- Perl client for interacting with the GCIS API
 
     my $c = Gcis::Client->new;
 
+    # Set url explicitly
     $c->url("http://data.globalchange.gov");
+
+    # use GCIS_API_URL environment variable for the url
+    $c->use_env;
 
     $c->logger(Mojo::Log->new(path => '/tmp/gcis-client.log');
 
