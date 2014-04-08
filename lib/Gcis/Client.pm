@@ -31,6 +31,7 @@ has ua => sub {
 has logger   => sub { state $log  ||= Mojo::Log->new(); };
 has json     => sub { state $json ||= JSON::XS->new(); };
 has accept   => "application/json";
+has 'tx';
 
 sub auth_hdr { ($a = shift->key) ? ("Authorization" => "Basic $a") : () }
 
@@ -38,6 +39,7 @@ sub get {
     my $s = shift;
     my $path = shift;
     my $tx = $s->ua->get($s->url."$path");
+    $s->tx($tx);
     my $res = $tx->success;
     unless ($res) {
         if ($tx->res->code && $tx->res->code == 404) {
@@ -62,6 +64,7 @@ sub post {
     my $path = shift;
     my $data = shift;
     my $tx = $s->ua->post($s->url."$path" => json => $data );
+    $s->tx($tx);
     my $res = $tx->success or do {
         $s->logger->error("$path : ".$tx->error.$tx->res->body);
         return;
@@ -75,6 +78,7 @@ sub delete {
     my $s = shift;
     my $path = shift;
     my $tx = $s->ua->delete($s->url."$path");
+    $s->tx($tx);
     my $res = $tx->success;
     unless ($res) {
         if ($tx->res->code && $tx->res->code == 404) {
@@ -94,6 +98,7 @@ sub put_file {
     my $file = shift;
     my $data = file($file)->slurp;
     my $tx = $s->ua->put($s->url."$path" => $data );
+    $s->tx($tx);
     my $res = $tx->success or do {
         $s->logger->error("$path : ".$tx->error.$tx->res->body);
         return;
@@ -109,6 +114,7 @@ sub post_quiet {
     my $path = shift;
     my $data = shift;
     my $tx = $s->ua->post($s->url."$path" => json => $data );
+    $s->tx($tx);
     my $res = $tx->success or do {
         $s->logger->error("$path : ".$tx->error.$tx->res->body) unless $tx->res->code == 404;
         return;
