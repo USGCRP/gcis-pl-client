@@ -217,8 +217,12 @@ sub get_form {
     my $c = shift;
     my $obj = shift;
     my $uri = $obj->{uri} or die "no uri in ".Dumper($obj);
-    # The last backslash becomes /form/update
-    $uri =~ s[/([^/]+)$][/form/update/$1];
+    if ($uri =~ m[/article]) {
+        $uri =~ s[article][article/form/update];
+    } else {
+        # The last backslash becomes /form/update
+        $uri =~ s[/([^/]+)$][/form/update/$1];
+    }
     return $c->get($uri);
 }
 
