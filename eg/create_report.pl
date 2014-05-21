@@ -6,7 +6,6 @@ use Gcis::Client;
 
 my $c = Gcis::Client->connect(url => $ARGV[0]);
 
-goto CHAPTER;
 $c->post(
   '/report',
   {
@@ -20,8 +19,6 @@ $c->post(
   }
 ) or die $c->error;
 
-CHAPTER:
-say "adding";
 # Add a chapter
 $c->post(
     "/report/my-new-report/chapter",
