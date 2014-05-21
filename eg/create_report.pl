@@ -28,7 +28,8 @@ $c->post(
         title             => "Some Title",
         number            => 12,
         sort_key          => 100,
-        # optional DOI
+        # optional doi
+        # optional url
     }
 ) or die $c->error;
 
