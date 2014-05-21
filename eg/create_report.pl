@@ -23,7 +23,7 @@ $c->post(
 $c->post(
     "/report/my-new-report/chapter",
     {
-        report_identifier => "my-report",
+        report_identifier => "my-new-report",
         identifier        => "my-chapter-identifier",
         title             => "Some Title",
         number            => 12,
