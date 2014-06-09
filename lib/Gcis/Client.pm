@@ -6,6 +6,7 @@ use JSON::XS;
 use YAML::XS qw/LoadFile/;
 use Path::Class qw/file/;
 use Data::Dumper;
+use Time::HiRes qw/sleep/;
 use v5.14;
 
 our $VERSION = 0.05;
@@ -40,6 +41,7 @@ sub get {
     my $s = shift;
     my $path = shift;
     if (defined($s->delay)) {
+        $s->logger->debug("sleeping for ".$s->delay.'s');
         sleep $s->delay;
     }
     my $tx = $s->ua->get($s->url."$path");
