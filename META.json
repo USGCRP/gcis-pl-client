@@ -26,6 +26,7 @@
          "requires" : {
             "JSON::XS" : "0",
             "Path::Class" : "0",
+            "Time::HiRes" : "0",
             "YAML::XS" : "0"
          }
       }
@@ -33,9 +34,9 @@
    "provides" : {
       "Gcis::Client" : {
          "file" : "lib/Gcis/Client.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
-   "version" : "0.05"
+   "version" : "0.06"
 }

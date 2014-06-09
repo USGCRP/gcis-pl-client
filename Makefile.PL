@@ -8,6 +8,7 @@ WriteMakefile
                    'JSON::XS' => 0,
                    'Path::Class' => 0,
                    'Test::More' => 0,
+                   'Time::HiRes' => 0,
                    'YAML::XS' => 0
                  },
   'INSTALLDIRS' => 'site',
