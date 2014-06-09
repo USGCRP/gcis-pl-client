@@ -13,6 +13,7 @@ our $VERSION = 0.04;
 has url      => 'http://localhost:3000';
 has 'key';
 has 'error';
+has 'delay' => $ENV{GCIS_API_DELAY};
 has ua => sub {
   my $c = shift;
   state $ua;
@@ -38,6 +39,9 @@ sub auth_hdr { ($a = shift->key) ? ("Authorization" => "Basic $a") : () }
 sub get {
     my $s = shift;
     my $path = shift;
+    if (defined($s->delay)) {
+        sleep $s->delay;
+    }
     my $tx = $s->ua->get($s->url."$path");
     $s->tx($tx);
     my $res = $tx->success;
@@ -290,6 +294,42 @@ Gcis::Client -- Perl client for interacting with the Global Change Information S
 
 This is a simple client for the GCIS API, based on L<Mojo::UserAgent>.
 
+=head1 ATTRIBUTES
+
+=head2 delay
+
+A delay between requests.
+
+=head2 url
+
+The base url for the API.
+
+=head2 key
+
+An access key for the API.
+
+=head2 error
+
+An error from the most recent reqeust.
+
+=head2 ua
+
+The Mojo::UserAgent object.
+
+=head2 logger
+
+A logger (defaults to a Mojo::Log object).
+
+=head2 accept
+
+An accept header to send with every request (defaults to "application/json");
+
+=head2 tx
+
+The Mojo::Transaction object from the most recent request.
+
+=cut
+
 =head1 METHODS
 
 =head2 connect
@@ -319,6 +359,7 @@ Get a map from chapter number to identifer.
 =head2 use_env
 
 Get the URL from the GCIS_API_URL environment variable.
+Also get an optional delay (in seconds) from GCIS_API_DELAY.
 
     $c->use_env;
 
