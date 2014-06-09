@@ -38,6 +38,12 @@ ok $c->post(
     }
 );
 
+my @rpt = $c->get('/report');
+ok @rpt >= 1, "got some reports";
+
+my $this = $c->get('/report/my-new-report');
+is ($this->{identifier}, 'my-new-report', 'got identifier');
+
 ok $c->delete('/report/my-new-report/chapter/my-chapter-identifier');
 ok $c->delete('/report/my-new-report');
 

@@ -249,7 +249,8 @@ Gcis::Client -- Perl client for interacting with the Global Change Information S
 
     use Gcis::Client;
 
-
+    my $c = Gcis::Client->new(url => 'http://data.globalchange.gov');
+    print $c->get('/report');
 
     my $c = Gcis::Client->connect(url => $ARGV[0]);
     $c->post(
