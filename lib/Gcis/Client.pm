@@ -243,39 +243,47 @@ __END__
 
 =head1 NAME
 
-Gcis::Client -- Perl client for interacting with the GCIS API
+Gcis::Client -- Perl client for interacting with the Global Change Information System
 
 =head1 SYNOPSIS
 
-    my $c = Gcis::Client->new;
+    use Gcis::Client;
 
-    # Set url explicitly
-    $c->url("http://data.globalchange.gov");
 
-    # use GCIS_API_URL environment variable for the url
-    $c->use_env;
 
-    $c->logger(Mojo::Log->new(path => '/tmp/gcis-client.log');
+    my $c = Gcis::Client->connect(url => $ARGV[0]);
+    $c->post(
+      '/report',
+      {
+        identifier       => 'my-new-report',
+        title            => "awesome report",
+        frequency        => "1 year",
+        summary          => "this is a great report",
+        report_type_identifier => "report",
+        publication_year => '2000',
+        url              => "http://example.com/report.pdf",
+      }
+    ) or die $c->error;
 
-    my $chapters = $c->get("/report/nca3draft/chapter?all=1") or die $c->error;
-
-    my $c = Gcis::Client->new(url => 'http://data.globalchange.gov');
+    # Add a chapter
+    $c->post(
+        "/report/my-new-report/chapter",
+        {
+            report_identifier => "my-new-report",
+            identifier        => "my-chapter-identifier",
+            title             => "Some Title",
+            number            => 12,
+            sort_key          => 100,
+            doi               => '10.1234/567',
+            url               => 'http://example.com/report',
+        }
+    ) or die $c->error;
 
     my $c = Gcis::Client->new
         ->url('http://data.globalchange.gov')
         ->logger($logger)
         ->find_credentials
         ->login;
-
-    my $ref = $c->post(
-      "/reference",
-      {
-        identifier        => $uuid,
-        publication_uri  => "/report/$parent_report",
-        sub_publication_uris => $chapter_uris,
-        attrs             => $rec,
-      }
-    ) or die $c->error;
 
 =head1 DESCRIPTION
 
@@ -307,10 +315,15 @@ Get a map from chapter number to identifer.
 
     my $identifier = $c->get_chapter_map('nca3')->{1}
 
+=head2 use_env
+
+Get the URL from the GCIS_API_URL environment variable.
+
+    $c->use_env;
+
 =head2 get
 
-    Get a URL, requesting JSON, converting an arrayref to an array
-if called in an array context.
+Get a URL, requesting JSON, converting an arrayref to an array if called in an array context.
 
 =head1 CONFIGRATION
 
