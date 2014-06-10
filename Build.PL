@@ -11,6 +11,7 @@ my $builder = Module::Build->new(
         'Test::More' => 0,
     },
     requires => {
+        'Mojo::UserAgent' => 0,
         'YAML::XS' => 0,
         'JSON::XS' => 0,
         'Path::Class' => 0,
