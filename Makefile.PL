@@ -6,6 +6,7 @@ WriteMakefile
   'VERSION_FROM' => 'lib/Gcis/Client.pm',
   'PREREQ_PM' => {
                    'JSON::XS' => 0,
+                   'Mojo::UserAgent' => 0,
                    'Path::Class' => 0,
                    'Test::More' => 0,
                    'Time::HiRes' => 0,
