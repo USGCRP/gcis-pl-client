@@ -25,7 +25,7 @@ my $client = Gcis::Client->new(url => $base );
 for my $report_identifier (@reports) {
     my $figures = $client->get("/report/$report_identifier/figure");
     for my $figure (@$figures) {
-        say "$base/figure/$figure->{identifier} : ";
+        say "$base/report/$report_identifier/figure/$figure->{identifier} : ";
         say "title : ".$figure->{title};
         say "caption : ".$figure->{caption};
         say "---";
