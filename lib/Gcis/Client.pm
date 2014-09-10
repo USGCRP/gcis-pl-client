@@ -39,7 +39,7 @@ sub auth_hdr { ($a = shift->key) ? ("Authorization" => "Basic $a") : () }
 
 sub get {
     my $s = shift;
-    my $path = shift;
+    my $path = shift or die "missing path";
     if (defined($s->delay)) {
         $s->logger->debug("sleeping for ".$s->delay.'s');
         sleep $s->delay;
@@ -53,8 +53,8 @@ sub get {
             $s->error("not found : $path");
             return;
         }
-        $s->error($tx->error);
-        $s->logger->error($tx->error);
+        $s->error($tx->error->{message});
+        $s->logger->error($tx->error->{message});
         return;
     };
     my $json = $res->json or do {
@@ -67,12 +67,12 @@ sub get {
 
 sub post {
     my $s = shift;
-    my $path = shift;
+    my $path = shift or Carp::confess "missing path";
     my $data = shift;
     my $tx = $s->ua->post($s->url."$path" => json => $data );
     $s->tx($tx);
     my $res = $tx->success or do {
-        $s->logger->error("$path : ".$tx->error.$tx->res->body);
+        $s->logger->error("got an error $path : ".Dumper($tx->error->{message}).$tx->res->body);
         return;
     };
     return unless $res;
@@ -91,8 +91,8 @@ sub delete {
             $s->error("not found : $path");
             return;
         }
-        $s->error($tx->error);
-        $s->logger->error($tx->error);
+        $s->error($tx->error->{message});
+        $s->logger->error($tx->error->{message});
         return;
     };
     return $res->body;
@@ -114,6 +114,14 @@ sub put_file {
     return $res->json;
 }
 
+sub add_file_url {
+    my $s = shift;
+    my $gcid = shift;
+    my $args = shift;
+    my $path = $gcid;
+    $path =~ s[/([^/]+)$][/files/$1];
+    $s->post($path => $args);
+}
 
 sub post_quiet {
     my $s = shift;
@@ -368,6 +376,15 @@ Also get an optional delay (in seconds) from GCIS_API_DELAY.
 =head2 get
 
 Get a URL, requesting JSON, converting an arrayref to an array if called in an array context.
+
+=head2 add_file_url
+
+Add a file using its URL.
+
+    $c->add_file_url($gcid => {
+        file_url => $file_url,
+        landing_page => $landing_page
+    });
 
 =head1 CONFIGRATION
 
