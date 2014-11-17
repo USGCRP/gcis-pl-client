@@ -1,8 +1,10 @@
 {
    "abstract" : "Client for GCIS Structured Data Server",
-   "author" : [],
+   "author" : [
+      "unknown"
+   ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4203",
+   "generated_by" : "Module::Build version 0.421",
    "license" : [
       "gpl_3"
    ],
@@ -35,9 +37,9 @@
    "provides" : {
       "Gcis::Client" : {
          "file" : "lib/Gcis/Client.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
-   "version" : "0.08"
+   "version" : "0.09"
 }
