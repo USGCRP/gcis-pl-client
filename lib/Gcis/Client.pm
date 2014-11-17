@@ -386,6 +386,15 @@ Add a file using its URL.
         landing_page => $landing_page
     });
 
+=head2 put_file
+
+PUT a local file to a remote destination.
+
+    $g->put_file($destination, $source) or die $g->error;
+
+    $path is the destination API path, like /report/files/nca2100/highres.pdf
+    $source is the local file, e.g. /tmp/nca2100.pdf
+
 =head1 CONFIGRATION
 
 Credentials can be stored in a YAML file called ~/etc/Gcis.conf.
