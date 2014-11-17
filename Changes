@@ -1,0 +1,6 @@
+
+Changes for Gcis::Client
+
+0.09 Mon Nov 17
+     Documentation, better error handling for put_file
+
