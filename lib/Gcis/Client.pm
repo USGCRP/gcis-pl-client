@@ -106,7 +106,9 @@ sub put_file {
     my $tx = $s->ua->put($s->url."$path" => $data );
     $s->tx($tx);
     my $res = $tx->success or do {
-        $s->logger->error("$path : ".$tx->error.$tx->res->body);
+        $s->error(join "\n",$tx->error->{message},$tx->res->body);
+        $s->logger->error($path." : ".$tx->error->{message});
+        $s->logger->error($tx->res->body);
         return;
     };
     return unless $res;
