@@ -40,11 +40,20 @@ sub auth_hdr { ($a = shift->key) ? ("Authorization" => "Basic $a") : () }
 sub get {
     my $s = shift;
     my $path = shift or die "missing path";
+    my $params = shift;
     if (defined($s->delay)) {
         $s->logger->debug("sleeping for ".$s->delay.'s');
         sleep $s->delay;
     }
-    my $tx = $s->ua->get($s->url."$path");
+    my $url;
+    if ($params) {
+        $url = Mojo::URL->new($s->url);
+        $url->path($path);
+        $url->query(%$params);
+    } else {
+        $url = Mojo::URL->new($s->url.$path);
+    }
+    my $tx = $s->ua->get($url);
     $s->tx($tx);
     my $res = $tx->success;
     unless ($res) {
@@ -378,6 +387,11 @@ Also get an optional delay (in seconds) from GCIS_API_DELAY.
 =head2 get
 
 Get a URL, requesting JSON, converting an arrayref to an array if called in an array context.
+An optional second parameter may be a hash which is converted into a query string.
+
+    $gcis->get('/report');
+    $gcis->get('/report', {report_type => 'assessment'});
+    $gcis->get('/report?report_type=assessment');
 
 =head2 add_file_url
 
