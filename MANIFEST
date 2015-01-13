@@ -1,6 +1,7 @@
 Build.PL
 Changes
 eg/assign-keywords.pl
+eg/autocomplete.pl
 eg/check-articles.pl
 eg/check-doi.pl
 eg/create_report.pl

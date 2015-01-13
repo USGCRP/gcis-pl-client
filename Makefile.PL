@@ -2,18 +2,18 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'EXE_FILES' => [],
+  'PL_FILES' => {},
   'INSTALLDIRS' => 'site',
+  'VERSION_FROM' => 'lib/Gcis/Client.pm',
   'PREREQ_PM' => {
-                   'Time::HiRes' => 0,
-                   'Path::Class' => 0,
-                   'Mojo::UserAgent' => 0,
                    'YAML::XS' => 0,
-                   'JSON::XS' => 0,
-                   'Test::More' => 0
+                   'Mojo::UserAgent' => 0,
+                   'Path::Class' => 0,
+                   'Test::More' => 0,
+                   'Time::HiRes' => 0,
+                   'JSON::XS' => 0
                  },
   'NAME' => 'Gcis::Client',
-  'VERSION_FROM' => 'lib/Gcis/Client.pm',
-  'PL_FILES' => {}
+  'EXE_FILES' => []
 )
 ;
