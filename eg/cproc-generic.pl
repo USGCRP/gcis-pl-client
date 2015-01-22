@@ -57,6 +57,7 @@ for (@$refs) {
 
  #  say " generic_pub :\n".Dumper($generic_pub);
     if ($dry_run) {
+        say "updating title : $->{title}, uri : $->{uri}";
         say "would have updated this reference";
         next;
     }
