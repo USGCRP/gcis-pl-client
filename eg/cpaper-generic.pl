@@ -10,7 +10,7 @@ use Data::Dumper;
 use strict;
 
 my $dry_run = 0;
-my $max_update = 100;
+my $max_update = 50;
 
 $| = 1;
 
@@ -37,7 +37,7 @@ say " n refs : $n";
 my $n_update = 0;
 for (@$refs) { 
  #  say " reftype : $_->{attrs}->{reftype}";
-    next if $_->{attrs}->{reftype} ne "Conference Proceedings";
+    next if $_->{attrs}->{reftype} ne "Conference Paper";
     next if $_->{child_publication_id};
     $n_update++;
     last if $n_update > $max_update;
@@ -48,9 +48,10 @@ for (@$refs) {
     for my $a (qw(Author Title reftype)) {
         $generic_pub->{attrs}->{$a} = $_->{attrs}->{$a};
     }
-    $generic_pub->{attrs}->{Year} = $_->{attrs}->{'Year of Conference'};
+    $generic_pub->{attrs}->{Year} = $_->{attrs}->{'Year'};
     $generic_pub->{attrs}->{Publisher} = $_->{attrs}->{'Conference Name'};
     $generic_pub->{attrs}->{Conference_Location} = $_->{attrs}->{'Conference Location'};
+    $generic_pub->{attrs}->{Pages} = $_->{attrs}->{'Pages'};
     $generic_pub->{attrs}->{Date} = $_->{attrs}->{'Date'};
     $generic_pub->{attrs}->{DOI} = $_->{attrs}->{'DOI'};
     $generic_pub->{attrs}->{URL} = $_->{attrs}->{'URL'};
