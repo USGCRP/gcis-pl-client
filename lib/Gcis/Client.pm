@@ -411,7 +411,7 @@ PUT a local file to a remote destination.
     $path is the destination API path, like /report/files/nca2100/highres.pdf
     $source is the local file, e.g. /tmp/nca2100.pdf
 
-=head1 CONFIGRATION
+=head1 CONFIGURATION
 
 Credentials can be stored in a YAML file called ~/etc/Gcis.conf.
 This contains URLs and keys, in this format :
