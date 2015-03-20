@@ -8,7 +8,6 @@ eg/create_report.pl
 eg/del-prov.pl
 eg/fix-file-sizes.pl
 eg/login.pl
-eg/refs-to-orgs
 eg/send_file.pl
 eg/show-figures.pl
 lib/Gcis/Client.pm
