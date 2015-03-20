@@ -1,6 +1,9 @@
 
 Changes for Gcis::Client
 
+0.11 Fri Mar 20 2015
+     Cleanup of example, fixed spelling in docs.
+
 0.10 Tue Jan 13 2015
      Allow hash to become a query string for $gcis->get.
 
