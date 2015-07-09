@@ -92,7 +92,8 @@ sub post {
 sub delete {
     my $s = shift;
     my $path = shift;
-    my $tx = $s->ua->delete($s->url."$path");
+    my $payload = shift;
+    my $tx = $s->ua->delete($s->url."$path", ( $payload ? (json => $payload) : () ) );
     $s->tx($tx);
     my $res = $tx->success;
     unless ($res) {
@@ -392,6 +393,13 @@ An optional second parameter may be a hash which is converted into a query strin
     $gcis->get('/report');
     $gcis->get('/report', {report_type => 'assessment'});
     $gcis->get('/report?report_type=assessment');
+
+=head2 delete
+
+Delete a record, optionally replacing it with another record.
+
+    $gcis->delete('/person/1234');
+    $gcis->delete('/person/1234', { replacement => "/person/7899" });
 
 =head2 add_file_url
 
