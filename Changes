@@ -1,6 +1,9 @@
 
 Changes for Gcis::Client
 
+0.12 Jul  9  2015
+     Support delete payloads for merging.
+
 0.11 Fri Mar 20 2015
      Cleanup of example, fixed spelling in docs.
 
