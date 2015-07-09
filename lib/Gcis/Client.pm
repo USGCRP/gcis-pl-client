@@ -9,7 +9,7 @@ use Data::Dumper;
 use Time::HiRes qw/sleep/;
 use v5.14;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 has url      => 'http://localhost:3000';
 has 'key';
