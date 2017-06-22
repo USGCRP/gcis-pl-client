@@ -8,6 +8,8 @@ Installation
 
 ```
 git clone https://github.com/USGCRP/gcis-pl-client.git
+cd gcis-pl-client
+cpanm --installdeps .
 export PERL5LIB=$PERL5LIB:path/to/gcis-pl-client/lib
 ```
 
