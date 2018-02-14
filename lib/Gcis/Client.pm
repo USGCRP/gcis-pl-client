@@ -74,6 +74,14 @@ sub get {
     return wantarray && ref($json) eq 'ARRAY' ? @$json : $json;
 }
 
+sub search {
+    my $s = shift;
+    my $type = shift || 'all';
+    my $query = shift or die 'missing search query';
+
+    $s->get('/search', { type => $type, q => $query });
+}
+
 sub post {
     my $s = shift;
     my $path = shift or Carp::confess "missing path";
@@ -418,6 +426,12 @@ PUT a local file to a remote destination.
 
     $path is the destination API path, like /report/files/nca2100/highres.pdf
     $source is the local file, e.g. /tmp/nca2100.pdf
+
+=head2 search
+
+Query the database.
+
+    $g->search($gcis_type, $search_query) or die $g->error;
 
 =head1 CONFIGURATION
 
