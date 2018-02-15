@@ -77,9 +77,10 @@ sub get {
 sub search {
     my $s = shift;
     my $type = shift || 'all';
+    my $count = shift || '-1';
     my $query = shift or die 'missing search query';
 
-    $s->get('/search', { type => $type, q => $query });
+    $s->get('/search', { type => $type, count => $count, q => $query });
 }
 
 sub post {
